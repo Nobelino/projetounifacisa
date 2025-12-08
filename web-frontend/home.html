@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Home - Promoções</title>
+    <link rel="stylesheet" href="home.css">
+</head>
+<body class="page">
+
+<main class="container">
+    <div class="page-header">
+        <h1>Supermercado - Promoções Personalizadas</h1>
+        <div>
+            <a href="admin.html" class="nav-link">Admin</a>
+            <button onclick="logout()" class="nav-link">Logout</button>
+        </div>
+    </div>
+
+    <section class="form-card">
+        <h2>Criar novo produto</h2>
+        <form id="createProductForm">
+            <div class="form-grid">
+                <label>
+                    Nome
+                    <input type="text" id="prodName" required>
+                </label>
+                <label>
+                    Preço
+                    <input type="number" step="0.01" min="0" id="prodPrice" required>
+                </label>
+                <label>
+                    Tipo
+                    <input type="text" id="prodType" placeholder="ex: bebida, laticínio" required>
+                </label>
+                <label>
+                    Descrição
+                    <textarea id="prodDesc" rows="2" placeholder="Opcional"></textarea>
+                </label>
+            </div>
+            <button type="submit" class="primary-btn">Adicionar produto</button>
+        </form>
+    </section>
+
+    <section class="info-panel">
+        <h3>Suas Categorias Preferidas</h3>
+        <div id="topCategoriesDiv" class="categories-list">
+            <p style="color: #999;">Nenhuma compra registrada ainda.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="section-title">Produtos com Promoções Personalizadas</h2>
+        <div id="productList" class="product-grid"></div>
+    </section>
+
+    <!-- <section>
+        <h2 class="section-title">Histórico de Compras</h2>
+        <div id="purchaseHistory" class="purchase-history">
+            <p style="color: #999;">Nenhuma compra registrada.</p>
+        </div>
+    </section> -->
+</main>
+
+<script src="app.js"></script>
+<script>
+    loadProducts();
+    loadPurchaseHistory();
+    loadTopCategories();
+</script>
+
+</body>
+</html>

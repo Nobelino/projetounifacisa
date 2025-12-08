@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Admin - Gerenciar Promoções</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .admin-container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 16px;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+
+            div {
+                display: flex;
+                align-items: center;
+            }
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 16px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .products-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .products-table th {
+            background: #f8f9fa;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .products-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .products-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .promo-form {
+            display: grid;
+            gap: 12px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            align-items: flex-end;
+        }
+
+        .promo-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .promo-active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .promo-inactive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .actions-cell {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .actions-cell button {
+            padding: 6px 12px;
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal.active {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 24px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        button.danger {
+            background: #dc3545;
+        }
+
+        button.danger:hover {
+            background: #c82333;
+        }
+    </style>
+</head>
+    
+<body class="page">
+
+    <div class="admin-container">
+        <div class="admin-header">
+            <h1>Gerenciar Promoções</h1>
+            <div>
+                <a href="home.html" class="btn-secondary">Home</a>
+                <button onclick="logout()" class="btn-secondary" style="margin-left: 10px;">Logout</button>
+            </div>
+        </div>
+
+        <table class="products-table">
+            <thead>
+                <tr>
+                    <th>Produto</th>
+                    <th>Tipo</th>
+                    <th>Preço</th>
+                    <th>Promoção</th>
+                    <th>Desconto</th>
+                    <th style="width: 180px;">Ações</th>
+                </tr>
+            </thead>
+            <tbody id="productsTableBody">
+            </tbody>
+        </table>
+    </div>
+
+    <div id="promoModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Editar Promoção</h2>
+            </div>
+            <form id="promoForm" class="promo-form">
+                <input type="hidden" id="productIdInput">
+
+                <label>
+                    Ativar promoção
+                    <input type="checkbox" id="promoActive">
+                </label>
+
+                <label>
+                    Percentual de desconto (%)
+                    <input type="number" min="0" max="100" id="discountPercent" value="0">
+                </label>
+
+                <label>
+                    Tipos de cliente (separados por vírgula)
+                    <input type="text" id="forTypes" placeholder="bebida, laticinio, carne">
+                </label>
+
+                <div class="modal-footer">
+                    <button type="button" onclick="closeModal()" class="btn-secondary">Cancelar</button>
+                    <button type="submit" class="primary-btn">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script src="admin.js"></script>
+    <script>
+        loadAdminProducts();
+    </script>
+
+</body>
+
+</html>

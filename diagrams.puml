@@ -1,0 +1,124 @@
+@startuml sequence_personalized_promo
+actor Cliente
+participant "Web Client" as Client
+participant "Backend (Node.js)" as Backend
+database "MongoDB" as DB
+
+== 1. LOGIN COM 2FA ==
+Cliente -> Client : Faz login
+Client -> Backend : POST /api/auth/login
+Backend -> DB : Busca user por email
+Backend -> Backend : Valida senha (bcrypt)
+Backend -> Backend : Gera código 2FA
+Backend --> Client : twoFactorId (debugCode)
+Cliente -> Client : Digita código 2FA
+Client -> Backend : POST /api/auth/verify-2fa
+Backend -> Backend : Valida código e gera JWT
+Backend --> Client : token JWT
+
+== 2. COMPRA DE PRODUTO ==
+Cliente -> Client : Clica "Comprar" em um produto
+Client -> Backend : POST /api/purchases {productId, type, quantity, totalPrice}
+Backend -> DB : Cria Purchase
+Backend -> DB : Atualiza user.preferences com type
+DB --> Backend : success
+Backend --> Client : Compra registrada
+
+== 3. VER RECOMENDAÇÕES PERSONALIZADAS ==
+Cliente -> Client : Acessa home (recarrega)
+Client -> Backend : GET /api/products (com token)
+Backend -> DB : Busca todos os produtos
+Backend -> DB : Busca histórico de purchases do usuário
+Backend -> Backend : Conta quantidade de compras por tipo
+Backend -> Backend : Ordena tipos por frequência
+Backend -> Backend : Para cada produto, verifica se:\n- promoção está ativa\n- tipo do produto está em promotion.forTypes
+Backend -> DB : Retorna produtos com personalizedPromotion flag
+Backend --> Client : {products: [...], topCategories: ["carne", "laticinio"]}
+Client -> Client : Destaca produtos com promo
+@enduml
+
+@startuml data_model
+class User {
+  +_id: ObjectId
+  +name: String
+  +cpf: String (unique)
+  +email: String (unique)
+  +passwordHash: String
+  +twoFactorCode: {code, expiresAt}
+  +preferences: [String]
+  +timestamps
+}
+
+class Product {
+  +_id: ObjectId
+  +name: String
+  +price: Number
+  +type: String
+  +description: String
+  +expiryDate: Date
+  +promotion: {
+    active: Boolean
+    discountPercent: Number
+    forTypes: [String]
+  }
+}
+
+class Purchase {
+  +_id: ObjectId
+  +userId: Ref<User>
+  +productId: Ref<Product>
+  +productType: String
+  +quantity: Number
+  +totalPrice: Number
+  +purchasedAt: Date
+  +timestamps
+}
+
+User "1" --* "n" Purchase : faz
+Product "1" --* "n" Purchase : é comprado em
+@enduml
+
+@startuml admin_flow
+actor Admin
+participant "Admin Interface" as AdminUI
+participant "Backend" as Backend
+database "MongoDB" as DB
+
+Admin -> AdminUI : Acessa admin.html
+AdminUI -> Backend : GET /api/products/admin/all
+Backend -> DB : Busca todos os produtos
+DB --> Backend : Lista completa
+Backend --> AdminUI : Tabela com produtos
+
+Admin -> AdminUI : Clica "Editar" em um produto
+AdminUI -> AdminUI : Abre modal com:\n- Toggle para ativar\n- Campo desconto (%)\n- Campo tipos de cliente
+
+Admin -> AdminUI : Preenche dados:\nativar=true, desconto=20%, tipos="carne,bebida"
+AdminUI -> Backend : PUT /api/products/{id}/promotion\n{active, discountPercent, forTypes}
+Backend -> DB : Atualiza Product.promotion
+DB --> Backend : sucesso
+Backend --> AdminUI : confirmação
+AdminUI -> AdminUI : Recarrega tabela
+@enduml
+
+@startuml client_purchase_flow
+actor Cliente
+participant "Home" as Home
+database "Backend" as Backend
+database "MongoDB" as DB
+
+Cliente -> Home : Vê lista de produtos\nalguns com badge "🎯 Promoção para você!"
+
+Cliente -> Home : Clica "Comprar" em produto (Carne R$50)
+Home -> Home : Prompt: "Quantos(as) Carne(s) deseja?"
+Cliente -> Home : "3"
+
+Home -> Backend : POST /api/purchases {\n  productId: "123",\n  productType: "carne",\n  quantity: 3,\n  totalPrice: 150\n}
+
+Backend -> DB : Cria Purchase
+Backend -> DB : Atualiza user.preferences\nadd "carne" se não existe
+Backend -> Home : {message: "Compra registrada", purchase: {...}}
+
+Home -> Home : Atualiza:\n- Histórico de compras\n- Categorias favoritas\n- Lista de produtos
+
+@enduml
