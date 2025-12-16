@@ -1,418 +1,303 @@
-# 🛒 Sistema de Promoções Personalizadas para Supermercado
+# 🏪 Sistema de Promoções Personalizadas para Supermercado
 
-Um sistema completo e profissional que permite um supermercado enviar promoções personalizadas para clientes baseado no seu histórico de compras.
-
-## 🎯 O Problema
-
-Um supermercado precisa de uma forma para enviar promoções específicas para seus clientes baseadas no que eles mais compram. Por exemplo: se um cliente compra muita carne, ele deveria receber promoções de carne quando fizer login no site.
-
-## ✅ A Solução
-
-Sistema inteligente que:
-1. **Rastreia** cada compra do cliente (produto, tipo, quantidade)
-2. **Aprende** as preferências automaticamente
-3. **Recomenda** promoções relevantes por cliente
-4. **Oferece** interface admin para gerenciar promoções
-
-## 🚀 Quick Start (5 minutos)
-
-### 1. Instalar dependências
-```bash
-cd backend
-npm install
-```
-
-### 2. Configurar banco de dados
-```bash
-# Copiar arquivo de exemplo
-cp .env.example .env
-
-# Editar .env se necessário (MongoDB URI, etc)
-```
-
-### 3. Iniciar servidor
-```bash
-npm start
-```
-
-O servidor estará em `http://localhost:4000`
-
-### 4. Abrir frontend
-```
-Abra em seu navegador:
-web-frontend/index.html
-```
-
-## 📋 Fluxo de Uso
-
-### 1️⃣ Cliente se Registra
-```
-register.html → Preenche dados → Conta criada
-```
-
-### 2️⃣ Cliente Faz Login
-```
-index.html → Email + Senha → Código 2FA → home.html
-```
-
-### 3️⃣ Cliente Compra Produto
-```
-home.html → Clica "Comprar" → Escolhe quantidade → Compra registrada
-```
-
-### 4️⃣ Admin Configura Promoções
-```
-admin.html → Seleciona produto → Define desconto e tipos → Salva
-```
-
-### 5️⃣ Cliente Vê Recomendações
-```
-home.html → Próximo login → Vê promoções personalizadas destacadas
-```
-
-## 📁 Estrutura do Projeto
-
-```
-supermarket-project/
-├── backend/
-│   ├── src/
-│   │   ├── server.js              # Entrada da API
-│   │   ├── config/
-│   │   │   └── db.js              # Conexão MongoDB
-│   │   ├── models/
-│   │   │   ├── User.js            # Usuário
-│   │   │   ├── Product.js         # Produto
-│   │   │   └── Purchase.js        # Compra (NOVO)
-│   │   ├── controllers/
-│   │   │   ├── authController.js
-│   │   │   ├── productController.js
-│   │   │   └── purchaseController.js  # NOVO
-│   │   ├── routes/
-│   │   │   ├── authRoutes.js
-│   │   │   ├── productRoutes.js
-│   │   │   └── purchaseRoutes.js      # NOVO
-│   │   ├── middlewares/
-│   │   └── utils/
-│   ├── package.json
-│   ├── .env                       # Variáveis de ambiente
-│   └── .env.example               # Referência
-│
-├── web-frontend/
-│   ├── index.html                 # Login
-│   ├── register.html              # Cadastro
-│   ├── home.html                  # Principal (cliente)
-│   ├── admin.html                 # Gerenciar promoções (NOVO)
-│   ├── app.js                     # Lógica principal
-│   ├── admin.js                   # Lógica admin (NOVO)
-│   ├── home.css                   # Estilos home
-│   └── styles.css                 # Estilos auth
-│
-└── mobile-app/
-    └── App.js                     # App React Native
-```
-
-## 🔑 Funcionalidades Principais
-
-### Para Cliente
-- ✅ Registrar conta com CPF
-- ✅ Login com 2FA (segurança)
-- ✅ Ver lista de produtos
-- ✅ **Comprar produtos** (novo)
-- ✅ **Ver histórico de compras** (novo)
-- ✅ **Ver categorias preferidas** (novo)
-- ✅ **Ver promoções personalizadas** (novo)
-- ✅ Logout
-
-### Para Admin
-- ✅ Criar produtos
-- ✅ **Editar promoções** (desconto, tipos de cliente)
-- ✅ **Deletar produtos** (novo)
-- ✅ Ver todos os produtos
-- ✅ Logout
-
-### Sistema
-- ✅ Rastreamento automático de compras
-- ✅ Atualização automática de preferências
-- ✅ Algoritmo de personalização em tempo real
-- ✅ Autenticação JWT
-- ✅ Two-Factor Authentication (2FA)
-
-## 📡 API Endpoints
-
-### Autenticação
-```
-POST   /api/auth/register              Criar conta
-POST   /api/auth/login                 Login
-POST   /api/auth/verify-2fa            Verificar 2FA
-```
-
-### Produtos
-```
-GET    /api/products                   Listar (com personalização)
-POST   /api/products                   Criar novo
-PUT    /api/products/:id/promotion     Editar promoção
-DELETE /api/products/:id               Deletar produto
-GET    /api/products/admin/all         Listar para admin
-```
-
-### Compras
-```
-POST   /api/purchases                  Registrar compra
-GET    /api/purchases/history          Histórico do cliente
-GET    /api/purchases/top-categories   Categorias mais compradas
-```
-
-## 🔐 Segurança
-
-- ✅ Senhas criptografadas com bcryptjs
-- ✅ JWT para autenticação de endpoints
-- ✅ 2FA (código de 6 dígitos)
-- ✅ CORS configurado
-- ✅ Validação de entrada em todos os endpoints
-- ✅ Cada cliente só acessa seus dados
-
-## 💡 Como Funciona a Personalização
-
-```
-1. Cliente compra "Carne Premium" (tipo: "carne")
-   ↓
-2. Sistema registra Purchase com tipo "carne"
-   ↓
-3. User.preferences é atualizado: +="carne"
-   ↓
-4. Próxima vez que cliente acessa home:
-   ↓
-5. GET /api/products busca histórico
-   ↓
-6. Sistema conta compras por tipo: carne (5x), leite (2x)
-   ↓
-7. Procura por promoções ativas para "carne"
-   ↓
-8. Encontra: Carne com 20% OFF para tipo "carne"
-   ↓
-9. Retorna produto com flag personalizedPromotion
-   ↓
-10. Frontend renderiza com badge e desconto destacado
-```
-
-## 🧪 Teste Rápido
-
-### 1. Registrar
-1. Abra `register.html`
-2. Preencha: Nome, CPF, Email, Senha
-3. Clique "Cadastrar"
-
-### 2. Login
-1. Abra `index.html`
-2. Email e Senha
-3. Use o código 2FA exibido
-4. Entra na `home.html`
-
-### 3. Criar Produto
-1. Na home, preencha o formulário:
-   - Nome: "Carne Premium"
-   - Preço: 50
-   - Tipo: "carne"
-2. Clique "Adicionar produto"
-
-### 4. Gerenciar Promoção
-1. Clique "Admin"
-2. Tabela mostra produtos
-3. Clique "Editar" em um produto
-4. Ative promoção: desconto 20%, tipos: "carne"
-5. Salve
-
-### 5. Comprar e Ver Recomendação
-1. Volte para home.html
-2. Clique "Comprar" na Carne
-3. Digite: 5
-4. Recarregue a página
-5. Veja: Carne com badge "🎯 Promoção para você!" e 20% OFF
-
-## 📊 Exemplo Real
-
-**Cenário: João é um cliente novo**
-
-**Dia 1 - Sem histórico:**
-- Login → Vê produtos sem promoção especial
-- Nenhuma compra registrada
-
-**Dia 2 - Faz primeira compra:**
-- Clica "Comprar" em Carne (R$50)
-- Compra 5 unidades
-- Sistema registra: 5x Carne = R$250
-
-**Dia 3 - Com histórico:**
-- Login
-- Sistema vê: João comprou carne 5x
-- Admin tinha criado: Carne 20% OFF para tipo "carne"
-- João vê: "🎯 Promoção para você!" em Carne
-- Preço: ~~R$50~~ → **R$40 (20% OFF)**
-- João compra novamente com desconto!
-
-**Resultado:**
-- João economiza R$50 (R$10 x 5)
-- Supermercado vende mais
-- Todos ganham! ✅
-
-## 🛠️ Tecnologias
-
-### Backend
-- Node.js
-- Express.js
-- MongoDB
-- Mongoose
-- bcryptjs (criptografia)
-- jsonwebtoken (JWT)
-- dotenv
-
-### Frontend
-- HTML5
-- CSS3
-- JavaScript Vanilla
-- Fetch API
-
-### Padrões
-- RESTful API
-- MVC Architecture
-- JWT Authentication
-- Two-Factor Authentication
-
-## ⚙️ Configuração (.env)
-
-```
-# Banco de dados
-MONGO_URI=mongodb://localhost:27017/supermarket
-
-# Segurança
-JWT_SECRET=sua_chave_secreta_muito_longa
-JWT_EXPIRES_IN=1d
-
-# Servidor
-PORT=4000
-NODE_ENV=development
-```
-
-## 📈 Fluxo de Dados
-
-```
-Cliente
-  ↓
-Frontend (HTML/CSS/JS)
-  ↓
-API REST (Express)
-  ↓
-Middleware (Auth)
-  ↓
-Controllers (Lógica)
-  ↓
-Models (MongoDB)
-  ↓
-Respostas JSON
-  ↓
-Frontend atualiza
-```
-
-## 🎓 Conceitos Implementados
-
-- ✅ MVC Architecture
-- ✅ RESTful API Design
-- ✅ JWT Authentication
-- ✅ Two-Factor Authentication
-- ✅ Database Modeling
-- ✅ Data Aggregation & Analytics
-- ✅ Personalization Algorithm
-- ✅ Error Handling
-- ✅ Input Validation
-- ✅ CORS Security
-- ✅ Responsive Design
-
-## 📚 Documentação Completa
-
-Veja os arquivos de documentação para mais detalhes:
-- `README.md` - Este arquivo
-- `QUICKSTART.md` - Como começar (passo a passo)
-- `RESUMO_PT_BR.md` - Explicação simples em português
-- `TECHNICAL_SUMMARY.md` - Detalhes técnicos
-- `TEST_DATA.md` - Dados e exemplos de teste
-- `CHANGELOG.md` - O que foi alterado
-- `START_HERE.md` - Guia de entrada rápida
-
-## 🐛 Troubleshooting
-
-### Erro: "Cannot connect to MongoDB"
-```
-Solução: Certifique-se que MongoDB está rodando
-Windows: mongod
-Linux: sudo systemctl start mongod
-```
-
-### Erro: "Port 4000 already in use"
-```
-Solução: Matar processos node em uso
-ps aux | grep node
-kill -9 <PID>
-```
-
-### Produtos não aparecem
-```
-Solução: Verificar se está logado e criou produtos
-1. Verificar token no localStorage
-2. Abrir DevTools (F12) → Console
-3. Ver mensagens de erro
-```
-
-### Promoção não aparece
-```
-Solução: Verificar configuração
-1. Ativar promo em admin.html
-2. Definir desconto > 0
-3. Adicionar tipos de cliente
-4. Fazer uma compra do tipo
-5. Recarregar página
-```
-
-## 🤝 Contribuindo
-
-Este é um projeto educacional. Para melhorias:
-1. Faça alterações
-2. Teste completamente
-3. Documente as mudanças
-4. Atualize este README
-
-## 📞 Suporte
-
-Dúvidas ou problemas?
-- Consulte `QUICKSTART.md` para setup
-- Consulte `TEST_DATA.md` para exemplos
-- Consulte `TECHNICAL_SUMMARY.md` para detalhes técnicos
-
-## ✨ Funcionalidades Futuras
-
-- [ ] Carrinho de compras
-- [ ] Checkout com integração de pagamento
-- [ ] Notificações por email
-- [ ] Dashboard de analytics
-- [ ] Cupons e vouchers
-- [ ] Avaliações de produtos
-- [ ] Wishlist/Favoritos
-- [ ] Mobile app nativo
-- [ ] Múltiplas lojas
-- [ ] Recomendações com IA/ML
-
-## 📝 Licença
-
-Projeto educacional - uso livre.
-
-## 👨‍💻 Desenvolvido
-
-Sistema de Promoções Personalizadas para Supermercado
-- **Data:** Dezembro de 2024
-- **Status:** ✅ Completo e Funcional
-- **Versão:** 1.0.0
+**Projeto Final da Disciplina:** Programar em Frontend e Analisar e Modelar Aplicações WEB e Mobile 2023.2
 
 ---
 
-**Pronto para começar? Abra `web-frontend/index.html` no seu navegador!** 🚀
+## 📋 Descrição do Projeto
 
-Para um guia de setup detalhado, veja: `QUICKSTART.md`
+Sistema completo que permite a um supermercado enviar promoções específicas baseadas no gosto e histórico de compras de seus clientes. O sistema é capaz de cadastrar produtos e promoções, permitindo que usuários vejam ofertas personalizadas quando logados no site.
+
+### Problema Abordado
+Um supermercado enfrenta o desafio de oferecer as melhores promoções de forma personalizada. Se um cliente frequentemente compra carnes, deve receber ofertas de descontos em carnes quando estiver navegando pela plataforma, aumentando a relevância e a taxa de conversão.
+
+---
+
+## 🎯 Funcionalidades Principais
+
+### Backend (Node.js + MongoDB)
+- ✅ Autenticação de usuários com email e senha
+- ✅ Verificação de dois fatores (2FA) com autenticador
+- ✅ Cadastro e gerenciamento de produtos
+- ✅ Sistema de promoções personalizadas
+- ✅ Middlewares de autenticação e validação
+- ✅ API RESTful com rotas protegidas
+- ✅ Conexão com banco de dados MongoDB
+
+### Frontend Web
+- ✅ Página de registro de usuários
+- ✅ Sistema de login com email e senha
+- ✅ Verificação 2FA na interface web
+- ✅ Dashboard com listagem de produtos
+- ✅ Exibição de promoções personalizadas
+- ✅ Interface responsiva e intuitiva
+- ✅ Proteção de rotas autenticadas
+
+### Aplicação Mobile
+- ✅ Tela de login
+- ✅ Página principal (home) com produtos
+- ✅ Exibição de promoções por tipo de produto
+- ✅ Interface otimizada para dispositivos móveis
+
+---
+
+## 🏗️ Arquitetura do Sistema
+
+```
+supermarket-project/
+├── backend/                    # API Node.js
+│   ├── src/
+│   │   ├── config/            # Configuração de banco de dados
+│   │   ├── controllers/       # Lógica de negócio (Auth, Product, Purchase)
+│   │   ├── middlewares/       # Autenticação e filtros de requisição
+│   │   ├── models/            # Schemas do MongoDB (User, Product, Purchase)
+│   │   ├── routes/            # Rotas da API
+│   │   ├── utils/             # Utilitários (2FA)
+│   │   └── server.js          # Arquivo principal
+│   ├── package.json
+│   └── .env                   # Variáveis de ambiente
+│
+├── web-frontend/              # Interface Web
+│   ├── index.html            # Página de login/registro
+│   ├── home.html             # Página principal
+│   ├── admin.html            # Painel administrativo
+│   ├── app.js                # Lógica frontend
+│   ├── styles.css            # Estilos
+│   └── home.css              # Estilos da home
+│
+├── mobile-app/               # Aplicação Mobile (Expo)
+│   └── App.js                # Componente principal
+│
+└── diagrams.puml             # Diagramas UML
+```
+
+---
+
+## 📊 Diagramas
+
+### Diagrama de Sequência - Login com 2FA
+```
+Usuário -> Frontend: Insere email/senha
+Frontend -> Backend: POST /auth/login
+Backend -> Backend: Valida credenciais
+Backend -> Autenticador: Gera código 2FA
+Backend -> Frontend: Retorna código (simulado)
+Usuário -> Frontend: Insere código 2FA
+Frontend -> Backend: POST /auth/verify-2fa
+Backend -> Backend: Valida código
+Backend -> Frontend: Retorna JWT Token
+Frontend -> Frontend: Redireciona para Home
+```
+
+### Diagrama de Casos de Uso
+- **Ator:** Usuário
+  - Registrar conta
+  - Fazer login
+  - Verificar 2FA
+  - Visualizar promoções
+  - Adicionar ao carrinho
+  - Fazer compra
+
+- **Ator:** Administrador
+  - Cadastrar produtos
+  - Criar promoções
+  - Gerenciar usuários
+
+### Diagrama de Classes
+
+**Usuário**
+- id: ObjectId
+- email: String
+- senha: String (hash)
+- nome: String
+- cpf: String
+- dataRegistro: Date
+
+**Produto**
+- id: ObjectId
+- nome: String
+- preco: Number
+- tipo: String (carne, laticínios, padaria, etc)
+- descricao: String
+- dataValidade: Date
+
+**Promoção**
+- id: ObjectId
+- produtoId: ObjectId (referência)
+- desconto: Number
+- dataCriacao: Date
+
+**Compra**
+- id: ObjectId
+- usuarioId: ObjectId (referência)
+- produtos: Array
+- total: Number
+- data: Date
+
+---
+
+## 🚀 Como Executar o Projeto
+
+### Pré-requisitos
+- Node.js v14+
+- MongoDB v4.4+
+- Git
+- Expo CLI (para mobile)
+
+### Instalação do Backend
+
+```bash
+# Acesse a pasta do backend
+cd backend
+
+# Instale as dependências
+npm install
+
+# Configure as variáveis de ambiente
+cp .env.example .env
+# Edite o .env com suas configurações
+
+# Inicie o servidor
+npm start
+# O servidor rodará em http://localhost:3000
+```
+
+### Variáveis de Ambiente (.env)
+```
+MONGODB_URI=mongodb://localhost:27017/supermarket
+JWT_SECRET=sua_chave_secreta_aqui
+PORT=3000
+NODE_ENV=development
+```
+
+### Instalação do Frontend Web
+
+```bash
+# Acesse a pasta do frontend
+cd web-frontend
+
+# Abra o arquivo index.html em um navegador
+# Ou use um servidor local:
+python -m http.server 8000
+# Acesse http://localhost:8000
+```
+
+### Instalação da Aplicação Mobile
+
+```bash
+# Acesse a pasta mobile
+cd mobile-app
+
+# Instale as dependências
+npm install
+
+# Inicie o Expo
+expo start
+
+# Escaneie o QR code com seu telefone (Expo Go app)
+```
+
+---
+
+## 🔐 Autenticação e Segurança
+
+### Processo de Login
+1. Usuário insere email e senha
+2. Backend valida credenciais no banco de dados
+3. Se válido, backend gera código 2FA aleatório
+4. Usuário insere o código no aplicativo
+5. Se correto, backend emite JWT Token
+6. Frontend armazena token e acessa rotas protegidas
+
+### Proteção de Rotas
+Todas as rotas da API requerem:
+- JWT Token válido no header `Authorization`
+- Middleware de autenticação valida o token
+- Apenas usuários autenticados acessam recursos
+
+---
+
+## 📦 Tecnologias Utilizadas
+
+### Backend
+- **Node.js** - Runtime JavaScript
+- **Express.js** - Framework web
+- **MongoDB** - Banco de dados NoSQL
+- **Mongoose** - ODM para MongoDB
+- **JWT** - Autenticação baseada em tokens
+- **bcryptjs** - Hash de senhas
+- **Dotenv** - Variáveis de ambiente
+- **Cors** - Controle de origem cruzada
+
+### Frontend Web
+- **HTML5** - Estrutura
+- **CSS3** - Estilos responsivos
+- **JavaScript (Vanilla)** - Lógica
+- **Fetch API** - Requisições HTTP
+
+### Mobile
+- **React Native** - Framework mobile
+- **Expo** - Plataforma de desenvolvimento
+- **Axios** - Cliente HTTP
+
+---
+
+## 📝 Requisitos Atendidos
+
+### Requisitos do Sistema WEB
+- ✅ Cadastrar novos usuários no sistema
+- ✅ Permitir que um usuário faça login
+- ✅ Listar itens na home
+
+### Requisitos do Sistema Mobile
+- ✅ Permitir que um usuário faça login
+- ✅ Abrir uma página principal (home)
+
+### Requisitos de Projeto
+- ✅ Organizar código com boas práticas (controllers, routers, models)
+- ✅ Separar código por tipo de dado
+- ✅ Conectar backend ao MongoDB
+- ✅ Proteger recursos com autenticação
+- ✅ Usuário tem: identificador, nome, CPF
+- ✅ Produto tem: nome, preço, tipo, descrição, validade
+- ✅ Middleware para filtrar requisições
+- ✅ Diagramas: sequência, casos de uso, classes
+
+### Requisitos de Diagramas
+- ✅ Diagrama de sequência (login com 2FA)
+- ✅ Simulação de autenticação de dois fatores
+- ✅ Diagrama de classes (backend)
+- ✅ Diagrama de casos de uso (toda aplicação)
+
+---
+
+## 🧪 Como Testar
+
+### Teste de Cadastro
+1. Acesse a página de registro
+2. Preencha: nome, email, CPF e senha
+3. Clique em "Registrar"
+4. Você será redirecionado para login
+
+### Teste de Login
+1. Use as credenciais criadas
+2. Email: `seu_email@example.com`
+3. Senha: `sua_senha`
+4. Clique em "Entrar"
+
+### Teste de 2FA
+1. Um código de 6 dígitos será gerado
+2. Digite o código no campo de verificação
+3. Se correto, será redirecionado para home
+
+### Teste de Promoções
+1. Na home, visualize os produtos
+2. Produtos de carnes têm 15% de desconto
+3. Laticínios têm 10% de desconto
+4. Padaria tem 5% de desconto
+
+---
+
+## 📄 Licença
+
+Este projeto é destinado para fins acadêmicos.
